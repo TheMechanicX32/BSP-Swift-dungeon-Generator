@@ -61,11 +61,10 @@ class TileEngine: SKNode {
             }
         }
         // Initialize a tile map and give it content to build with
-        let Tiles = SKTileSet(named: "Dungeon")
-        let TileGroups = Tiles?.tileGroups
         
+        // Both textures are 32x32 px and are required to see any data from thee generator
         let tile1 = SKTexture(imageNamed: "black")
-        let tile2 = SKTexture(imageNamed: "door")
+        let tile2 = SKTexture(imageNamed: "red")
         
         let black = SKTileDefinition(texture: tile1, size: tileSize)
         let red = SKTileDefinition(texture: tile2, size: tileSize)
@@ -200,10 +199,10 @@ class Leaf {
             }
             // If there are both left and right children in leaf, make hallway between them
             if leftChild != nil && rightChild != nil {
-                // If there is a room in either the left or right leaves
+                // If there is a room in either the left or right leaves...
                 guard let leftRoom = leftChild!.getRoom(), let rightRoom = rightChild!.getRoom() else { return }
                 
-                // If there is, create a hall between them
+                // ...Create a hallway between them
                 createHall(left: leftRoom, right: rightRoom)
                 print(hallways.count)
             }
@@ -235,6 +234,7 @@ class Leaf {
         let w = point2.x - point1.x
         let h = point2.y - point1.y
         
+        // Not quite functional. Needs a bit of debugging and some improvements
         if w < 0 {
             if h < 0 {
                 if Double.random(in: 0..<1.0) > 0.5 {
