@@ -235,52 +235,22 @@ class Leaf {
         let h = point2.y - point1.y
         
         // Not quite functional. Needs a bit of debugging and some improvements
-        if w < 0 {
-            if h < 0 {
-                if Double.random(in: 0..<1.0) > 0.5 {
-                    hallways.append(Room(X: Int(point2.x), Y: Int(point1.y), W: Int(abs(w)), H: 1))
-                    hallways.append(Room(X: Int(point2.x), Y: Int(point2.y), W: 1, H: Int(abs(h))))
-                } else {
-                    hallways.append(Room(X: Int(point2.x), Y: Int(point2.y), W: Int(abs(w)), H: 1))
-                    hallways.append(Room(X: Int(point1.x), Y: Int(point2.y), W: 1, H: Int(abs(h))))
-                }
-            } else if h > 0 {
-                if Double.random(in: 0..<1.0) > 0.5 {
-                    hallways.append(Room(X: Int(point2.x), Y: Int(point1.y), W: Int(abs(w)), H: 1))
-                    hallways.append(Room(X: Int(point2.x), Y: Int(point1.y), W: 1, H: Int(abs(h))))
-                } else {
-                    hallways.append(Room(X: Int(point2.x), Y: Int(point2.y), W: Int(abs(w)), H: 1))
-                    hallways.append(Room(X: Int(point1.x), Y: Int(point1.y), W: 1, H: Int(abs(h))))
-                }
-            } else {
-                hallways.append(Room(X: Int(point2.x), Y: Int(point2.y), W: Int(abs(w)), H: 1))
-            }
-        } else if w > 0 {
-            if h < 0 {
-                if Double.random(in: 0..<1.0) > 0.5 {
-                    hallways.append(Room(X: Int(point1.x), Y: Int(point2.y), W: Int(abs(w)), H: 1))
-                    hallways.append(Room(X: Int(point1.x), Y: Int(point2.y), W: 1, H: Int(abs(h))))
-                } else {
-                    hallways.append(Room(X: Int(point1.x), Y: Int(point1.y), W: Int(abs(w)), H: 1))
-                    hallways.append(Room(X: Int(point2.x), Y: Int(point2.y), W: 1, H: Int(abs(h))))
-                }
-            } else if h > 0 {
-                if Double.random(in: 0..<1.0) > 0.5 {
-                    hallways.append(Room(X: Int(point1.x), Y: Int(point1.y), W: Int(abs(w)), H: 1))
-                    hallways.append(Room(X: Int(point2.x), Y: Int(point1.y), W: 1, H: Int(abs(h))))
-                } else {
-                    hallways.append(Room(X: Int(point1.x), Y: Int(point2.y), W: Int(abs(w)), H: 1))
-                    hallways.append(Room(X: Int(point1.x), Y: Int(point1.y), W: 1, H: Int(abs(h))))
-                }
-            } else {
-                hallways.append(Room(X: Int(point1.x), Y: Int(point1.y), W: Int(abs(w)), H: 1))
-            }
+        if Bool.random() {
+            // Horizontally first, then vertically:
+            // From point1 to (point2.x, point1.y):
+            hallways.append(Room(X: Int(min(point1.x, point2.x)), Y: Int(point1.y),
+                                 W: Int(abs(point1.x - point2.x)), H: 1))
+            // From (point2.x, point1.y) to point2:
+            hallways.append(Room(X: Int(point2.x), Y: Int(min(point1.y, point2.y)),
+                                 W: 1, H: Int(abs(point1.y - point2.y))))
         } else {
-            if h < 0 {
-                hallways.append(Room(X: Int(point2.x), Y: Int(point2.y), W: 1, H: Int(abs(h))))
-            } else if h > 0 {
-                hallways.append(Room(X: Int(point1.x), Y: Int(point1.y), W: 1, H: Int(abs(h))))
-            }
+            // Vertically first, then Horizontally:
+            // From point1 to (point1.x, point2.y):
+            hallways.append(Room(X: Int(point1.x), Y: Int(min(point1.y, point2.y)),
+                                 W: 1, H: Int(abs(point1.y - point2.y))))
+            // From (point1.x, point2.y) to point2:
+            hallways.append(Room(X: Int(min(point1.x, point2.x)), Y: Int(point2.y),
+                                 W: Int(abs(point1.x - point2.x)), H: 1))
         }
     }
 }
