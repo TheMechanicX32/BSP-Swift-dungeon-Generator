@@ -26,8 +26,7 @@ class TileEngine: SKNode {
         let maxLeafSize = 20
         
         // First, create leaf to be root of all leaves
-        // Subtract 1 from width and height so no rooms are placed against the edge of the tile map
-        let root = Leaf(X: 0, Y: 0, W: columns - 1, H: rows - 1);
+        let root = Leaf(X: 0, Y: 0, W: columns, H: rows);
         leaves.append(root)
         
         var didSplit:Bool = true;
@@ -38,7 +37,7 @@ class TileEngine: SKNode {
             for leaf in leaves {
                 if leaf.leftChild == nil && leaf.rightChild == nil { // If not split
                     // If this leaf is too big, or 75% chance
-                    if leaf.width > maxLeafSize || leaf.height > maxLeafSize || Double.random(in: 0..<1.0) > 0.25 {
+                    if leaf.width > maxLeafSize || leaf.height > maxLeafSize || Int.random(in: 0..<100) > 25 {
                         if (leaf.split()) { // split the leaf
                             // If split worked, push child leaves into array
                             leaves.append(leaf.leftChild!)
@@ -62,27 +61,27 @@ class TileEngine: SKNode {
             }
         }
         // Initialize a tile map and give it content to build with
-        let Tiles = SKTileSet(named: "Dungeon")
-        let TileGroups = Tiles?.tileGroups
         
+        // A 32x32 black texture
         let tile1 = SKTexture(imageNamed: "black")
-        let tile2 = SKTexture(imageNamed: "door")
+        
+        // A 32x32 red texture
+        let tile2 = SKTexture(imageNamed: "red")
         
         let black = SKTileDefinition(texture: tile1, size: tileSize)
         let red = SKTileDefinition(texture: tile2, size: tileSize)
         
         let tileGroup1 = SKTileGroup(tileDefinition: black)
         let tileGroup2 = SKTileGroup(tileDefinition: red)
-        let tileGroup3 = TileGroups![0]
         
-        let tileSet = SKTileSet(tileGroups: [tileGroup1,tileGroup2, tileGroup3])
+        let tileSet = SKTileSet(tileGroups: [tileGroup1,tileGroup2])
         
         let tileMap = SKTileMapNode(tileSet: tileSet, columns: columns, rows: rows, tileSize: tileSize)
         
         for c in 0..<tileMap.numberOfColumns {
             for r in 0..<tileMap.numberOfRows {
                 for i in rooms {
-                    // iterate through each room and draw it in
+                    // iterate through each room and carve it out
                     if i.x1 <= c && i.x2 >= c && i.y1 <= r && i.y2 >= r {
                         tileMap.setTileGroup(tileGroup2, forColumn: c, row: r)
                     } else if tileMap.tileGroup(atColumn: c, row: r) != tileGroup2 && tileMap.tileGroup(atColumn: c, row: r) != tileGroup3 {
@@ -90,8 +89,7 @@ class TileEngine: SKNode {
                     }
                 }
                 for h in hallways {
-                    // iterate through each hallway and draw it in
-                    print(h.x1, h.x2, h.y1, h.y2)
+                    // iterate through each hallway and carve it out
                     if h.x1 <= c && h.x2 >= c && h.y1 <= r && h.y2 >= r {
                         tileMap.setTileGroup(tileGroup2, forColumn: c, row: r)
                     } else if tileMap.tileGroup(atColumn: c, row: r) != tileGroup2 && tileMap.tileGroup(atColumn: c, row: r) != tileGroup3 {
@@ -100,20 +98,17 @@ class TileEngine: SKNode {
                 }
             }
         }
-        // Remove this to return the tile map to its default size of (columns * tileSize) x (rows * tileSize)
-        tileMap.setScale(0.2)
         
         self.addChild(tileMap)
+        tileMap.setScale(0.2)
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    // Get rooms and append them to an array to be drawn into the tile map
+    
     func drawRoom(roomRect: Room) {
         rooms.append(roomRect)
     }
-    
-    // Get hallways and append them into an array to be drawn into the tile map
     func drawHall(hallRect: [Room]) {
         for rect in hallRect {
             hallways.append(rect)
