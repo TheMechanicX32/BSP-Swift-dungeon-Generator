@@ -9,6 +9,11 @@
 import Foundation
 import SpriteKit
 
+// Store the x and y values of the room.width and room.height so they can be accessed to draw hallways
+struct point {
+    var x: Int
+    var y: Int
+}
 // A class to help translate generated data into a visual tile map
 class TileEngine: SKNode {
     
@@ -39,7 +44,7 @@ class TileEngine: SKNode {
                     // If this leaf is too big, or 75% chance
                     if leaf.width > maxLeafSize || leaf.height > maxLeafSize || Int.random(in: 0..<100) > 25 {
                         if (leaf.split()) { // split the leaf
-                            // If split worked, push child leafs into vector
+                            // If split worked, push child leaves into array
                             leaves.append(leaf.leftChild!)
                             leaves.append(leaf.rightChild!)
                             didSplit = true
@@ -62,8 +67,10 @@ class TileEngine: SKNode {
         }
         // Initialize a tile map and give it content to build with
         
-        // Both textures are 32x32 px and are required to see any data from thee generator
+        // A 32x32 black texture
         let tile1 = SKTexture(imageNamed: "black")
+        
+        // A 32x32 red texture
         let tile2 = SKTexture(imageNamed: "red")
         
         let black = SKTileDefinition(texture: tile1, size: tileSize)
@@ -71,25 +78,24 @@ class TileEngine: SKNode {
         
         let tileGroup1 = SKTileGroup(tileDefinition: black)
         let tileGroup2 = SKTileGroup(tileDefinition: red)
-        let tileGroup3 = TileGroups![0]
         
-        let tileSet = SKTileSet(tileGroups: [tileGroup1,tileGroup2, tileGroup3])
+        let tileSet = SKTileSet(tileGroups: [tileGroup1,tileGroup2])
         
         let tileMap = SKTileMapNode(tileSet: tileSet, columns: columns, rows: rows, tileSize: tileSize)
         
         for c in 0..<tileMap.numberOfColumns {
             for r in 0..<tileMap.numberOfRows {
-                for i in 0..<rooms.count {
+                for i in rooms {
                     // iterate through each room and carve it out
-                    if rooms[i].x1 <= c && rooms[i].x2 >= c && rooms[i].y1 <= r && rooms[i].y2 >= r {
+                    if i.x1 <= c && i.x2 >= c && i.y1 <= r && i.y2 >= r {
                         tileMap.setTileGroup(tileGroup2, forColumn: c, row: r)
                     } else if tileMap.tileGroup(atColumn: c, row: r) != tileGroup2 && tileMap.tileGroup(atColumn: c, row: r) != tileGroup3 {
                         tileMap.setTileGroup(tileGroup1, forColumn: c, row: r)
                     }
                 }
-                for h in 0..<hallways.count {
+                for h in hallways {
                     // iterate through each hallway and carve it out
-                    if hallways[h].x1 <= c && hallways[h].x2 >= c && hallways[h].y1 <= r && hallways[h].y2 >= r {
+                    if h.x1 <= c && h.x2 >= c && h.y1 <= r && h.y2 >= r {
                         tileMap.setTileGroup(tileGroup2, forColumn: c, row: r)
                     } else if tileMap.tileGroup(atColumn: c, row: r) != tileGroup2 && tileMap.tileGroup(atColumn: c, row: r) != tileGroup3 {
                         tileMap.setTileGroup(tileGroup1, forColumn: c, row: r)
@@ -199,12 +205,11 @@ class Leaf {
             }
             // If there are both left and right children in leaf, make hallway between them
             if leftChild != nil && rightChild != nil {
-                // If there is a room in either the left or right leaves...
+                // If there is a room in either the left or right leaves
                 guard let leftRoom = leftChild!.getRoom(), let rightRoom = rightChild!.getRoom() else { return }
                 
-                // ...Create a hallway between them
+                // If there is, create a hall between them
                 createHall(left: leftRoom, right: rightRoom)
-                print(hallways.count)
             }
         } else if Int.random(in: 0..<100) > 25 {
             // Room can be between 3x3 tiles to (leaf.size - 2)
@@ -221,35 +226,31 @@ class Leaf {
     }
     public func createHall(left:Room, right:Room) {
         // Connects 2 rooms together with hallways
-        hallways = []
+        hallways = [];
     
         // get width and height of first room
-        let point1 = CGPoint(x: Int.random(in: (left.x1 + 1)..<(left.x2 - 1)),
-                             y: Int.random(in: (left.y1 + 1)..<(left.y2 - 1)))
+        let point1 = point(x: Int.random(in: (left.x1 + 1)..<(left.x2 - 1)),
+                           y: Int.random(in: (left.y1 + 1)..<(left.y2 - 1)))
         
         // get width and height of second room
-        let point2 = CGPoint(x: Int.random(in: (right.x1 + 1)..<(right.x2 - 1)),
-                             y: Int.random(in: (right.y1 + 1)..<(right.y2 - 1)))
+        let point2 = point(x: Int.random(in: (right.x1 + 1)..<(right.x2 - 1)),
+                           y: Int.random(in: (right.y1 + 1)..<(right.y2 - 1)))
         
-        let w = point2.x - point1.x
-        let h = point2.y - point1.y
-        
-        // Not quite functional. Needs a bit of debugging and some improvements
         if Bool.random() {
             // Horizontally first, then vertically:
-            // From point1 to (point2.x, point1.y):
-            hallways.append(Room(X: Int(min(point1.x, point2.x)), Y: Int(point1.y),
+            // From point1 to min(point2.x, point1.y):
+            hallways.append(Room(X: min(point1.x, point2.x), Y: point1.y,
                                  W: Int(abs(point1.x - point2.x)), H: 1))
             // From (point2.x, point1.y) to point2:
-            hallways.append(Room(X: Int(point2.x), Y: Int(min(point1.y, point2.y)),
+            hallways.append(Room(X: point2.x, Y: min(point1.y, point2.y),
                                  W: 1, H: Int(abs(point1.y - point2.y))))
         } else {
             // Vertically first, then Horizontally:
-            // From point1 to (point1.x, point2.y):
-            hallways.append(Room(X: Int(point1.x), Y: Int(min(point1.y, point2.y)),
+            // From point1 to min(point1.x, point2.y):
+            hallways.append(Room(X: point1.x, Y: min(point1.y, point2.y),
                                  W: 1, H: Int(abs(point1.y - point2.y))))
             // From (point1.x, point2.y) to point2:
-            hallways.append(Room(X: Int(min(point1.x, point2.x)), Y: Int(point2.y),
+            hallways.append(Room(X: min(point1.x, point2.x), Y: point2.y,
                                  W: Int(abs(point1.x - point2.x)), H: 1))
         }
     }
