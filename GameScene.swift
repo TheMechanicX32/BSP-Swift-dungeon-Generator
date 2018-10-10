@@ -1,16 +1,13 @@
 //
 //  GameScene.swift
-//  Dungeon Pirates
-//
-//  Created by HuckStudio on 9/5/18.
-//  Copyright © 2018 HucksCorp. All rights reserved.
-//
+//  
 
 import SpriteKit
 import GameplayKit
 
 class GameScene: SKScene {
     
+    // Initialize a new BSP map.
     var map = TileEngine(tileSize: CGSize(width: 32, height: 32), columns: 50, rows: 50)
     
     override func didMove(to view: SKView) {
