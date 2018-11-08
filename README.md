@@ -6,7 +6,7 @@ Download the files "Generator.swift" and "GameScene.swift" and drop them into yo
 
 To initialize a custom map: 
 
-`map = TileEngine(TileEngine(tileSize: CGSize(width: Int, height: Int), columns: Int, rows: Int)`
+`map = TileEngine(tileSize: CGSize(width: Int, height: Int), columns: Int, rows: Int)`
 
 Because the dungeons are procedurally generated, no two dungeons will ever generate the same.
 
