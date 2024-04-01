@@ -1,5 +1,5 @@
 # BSP-Swift-dungeon-Generator
-A Swift 4.2 translation of [this tutorial](https://gamedevelopment.tutsplus.com/tutorials/how-to-use-bsp-trees-to-generate-game-maps--gamedev-12268)
+A Swift 4.2 translation of [this tutorial.](https://gamedevelopment.tutsplus.com/tutorials/how-to-use-bsp-trees-to-generate-game-maps--gamedev-12268) When I was developing a side project, Apple's SKTileMap framework was riddled with bugs and did not cut it for me. So I wrote my own based off of the above tutorial to compensate. 
 
 ## Usage: 
 Download the files "Generator.swift" and "GameScene.swift" and drop them into your *.xcodeproject* or simply copy/paste the code into wherever you need it. The code is formatted and commented. It has been tested and is working.  
